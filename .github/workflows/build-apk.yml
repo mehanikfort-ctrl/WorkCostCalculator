@@ -1,4 +1,4 @@
-MainActivity
+MainActivity.kt
 name: Build APK
 
 on:
