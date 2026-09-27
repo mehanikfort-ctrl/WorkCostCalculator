@@ -47,7 +47,10 @@ jobs:
           touch gradle.properties
           echo "android.useAndroidX=true" >> gradle.properties
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
-
+      - name: Fix expr typo
+        run: |
+           cd buildv14
+           sed -i 's/\bexpr\b/expression/g' app/src/main/java/com/example/workcost/MainActivity.kt
       - name: Build APK
         run: |
           cd buildv14
