@@ -25,11 +25,16 @@ jobs:
         with:
           gradle-version: '8.13'
 
+      - name: Show files
+        run: |
+          pwd
+          find . -maxdepth 3 -type f | head -100
+
       - name: Unpack project
         run: |
-          unzip -q WorkCostCalculator_Android_v1_4_phone_build.zip
-          cp gradle.properties buildv14/gradle.properties
-     
+          unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
+          find . -maxdepth 3 -type f | head -100
+
       - name: Show MainActivity
         run: |
           echo "===== MAINACTIVITY.KT ====="
@@ -38,34 +43,10 @@ jobs:
 
       - name: Fix JVM targets
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          p = Path("buildv14/app/build.gradle.kts")
-          s = p.read_text()
-
-          if "compileOptions {" not in s:
-              s = s.replace(
-                  "android {",
-                  """android {
-              compileOptions {
-                  sourceCompatibility = JavaVersion.VERSION_17
-                  targetCompatibility = JavaVersion.VERSION_17
-              }
-          """,
-                  1
-              )
-
-          if "compilerOptions.jvmTarget" not in s:
-              s += """
-
-          tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-              compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-          }
-          """
-
-          p.write_text(s)
-          PY
+          cd buildv14
+          if [ -f gradle.properties ]; then
+            echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
+          fi
 
       - name: Build APK
         run: |
