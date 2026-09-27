@@ -33,6 +33,7 @@ jobs:
       - name: Unpack project
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build.zip
+          cp gradle.properties buildv14/gradle.properties
           find . -maxdepth 3 -type f | head -100
 
       - name: Build APK
