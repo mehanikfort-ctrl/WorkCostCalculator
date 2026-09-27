@@ -1,4 +1,3 @@
-MainActivity.kt
 name: Build APK
 
 on:
@@ -30,6 +29,12 @@ jobs:
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build.zip
           cp gradle.properties buildv14/gradle.properties
+     
+      - name: Show MainActivity
+        run: |
+          echo "===== MAINACTIVITY.KT ====="
+          cat buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
+          echo "===== END MAINACTIVITY.KT ====="
 
       - name: Fix JVM targets
         run: |
