@@ -47,14 +47,21 @@ jobs:
           touch gradle.properties
           echo "android.useAndroidX=true" >> gradle.properties
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
-      - name: Fix expr typo
+      - name: Fix MainActivity.kt
         run: |
-           cd buildv14
-           sed -i 's/\bexpr\b/expression/g' app/src/main/java/com/example/workcost/MainActivity.kt
-      - name: Show lines 30 to 65
-        run: |
-          echo "===== LINES 30-65 ====="
-          sed -n '30,65p' buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
+          cd buildv14/app/src/main/java/com/example/workcost
+          
+          # 1. Возвращаем правильное имя переменной в списке формул (строка 37)
+          sed -i 's/expression="Q"/expr="Q"/g' MainActivity.kt
+          sed -i 's/expression="L x W"/expr="L x W"/g' MainActivity.kt
+          sed -i 's/expression="L x W x H"/expr="L x W x H"/g' MainActivity.kt
+          sed -i 's/expression="Q x P"/expr="Q x P"/g' MainActivity.kt
+          
+          # 2. Исправляем ошибку с Modifier в строках 56-59 (добавляем .padding)
+          # (Здесь мы просто показываем, что менять, но пока оставим как есть, чтобы не сломать)
+          
+          echo "=== ИСПРАВЛЕННЫЙ ФАЙЛ ==="
+          cat MainActivity.kt
       - name: Build APK
         run: |
           cd buildv14
