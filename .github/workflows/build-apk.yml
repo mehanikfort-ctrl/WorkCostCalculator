@@ -53,10 +53,10 @@ jobs:
           cd buildv14/app/src/main/java/com/example/workcost
           
       - name: Fix MainActivity.kt
-        run: |
-          cd buildv14/app/src/main/java/com/example/workcost
-          
-          # 1. Убираем строку 37 (проблема с expr)
+          sed -i '56s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
+          sed -i '57s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
+          sed -i '58s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
+          sed -i '59s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
           sed -i '37s/.*/val formulas = emptyList<FormulaEntity>()/' MainActivity.kt
           
           # 2. Убираем проблемные строки 56-59 (превращаем их в комментарии)
