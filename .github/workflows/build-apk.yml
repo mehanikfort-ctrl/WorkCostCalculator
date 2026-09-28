@@ -56,6 +56,15 @@ jobs:
           sed -i 's/expression="L x W"/expr="L x W"/g' MainActivity.kt
           sed -i 's/expression="L x W x H"/expr="L x W x H"/g' MainActivity.kt
           sed -i 's/expression="Q x P"/expr="Q x P"/g' MainActivity.kt
+                    # 3. Исправляем ошибки с Modifier в строках 56-59
+          # Убираем лишние фигурные скобки, если они есть
+          sed -i 's/Modifier\.padding(\([0-9]*\)\.dp){/Modifier.padding(\1.dp)/g' MainActivity.kt
+          sed -i 's/Modifier\.padding(\([0-9]*\)\.dp) {/Modifier.padding(\1.dp)/g' MainActivity.kt
+          
+          # 4. Показываем строки 50-65 для проверки
+          echo "=== LINES 50-65 ==="
+          sed -n '50,65p' MainActivity.kt
+          echo "=== END LINES ==="
           
           # 2. Исправляем ошибку с Modifier в строках 56-59 (добавляем .padding)
           # (Здесь мы просто показываем, что менять, но пока оставим как есть, чтобы не сломать)
