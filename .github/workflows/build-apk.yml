@@ -35,6 +35,7 @@ jobs:
           touch gradle.properties
           echo "android.useAndroidX=true" >> gradle.properties
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
+          echo "org.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8" >> gradle.properties
 
       - name: Fix MainActivity.kt
         run: |
