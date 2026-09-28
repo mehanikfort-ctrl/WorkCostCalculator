@@ -47,7 +47,7 @@ jobs:
           touch gradle.properties
           echo "android.useAndroidX=true" >> gradle.properties
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
-    
+
       - name: Fix MainActivity.kt
         run: |
           cd buildv14/app/src/main/java/com/example/workcost
@@ -58,27 +58,28 @@ jobs:
           sed -i 's/expression="L x W x H"/expr="L x W x H"/g' MainActivity.kt
           sed -i 's/expression="Q x P"/expr="Q x P"/g' MainActivity.kt
           
-          # 2. Исправляем ошибки с Modifier (убираем лишние скобки)
+          # 2. Исправляем ошибки с Modifier
           sed -i 's/Modifier\.padding(\([0-9]*\)\.dp){/Modifier.padding(\1.dp)/g' MainActivity.kt
           sed -i 's/Modifier\.padding(\([0-9]*\)\.dp) {/Modifier.padding(\1.dp)/g' MainActivity.kt
           
           # 3. Сохраняем исправленный файл для скачивания
           cp MainActivity.kt $GITHUB_WORKSPACE/MainActivity_fixed.kt
-       - name: Build APK
-         run: |
+
+      - name: Build APK
+        run: |
           cd buildv14
           gradle --no-daemon :app:assembleDebug
 
-        - name: Upload fixed MainActivity
-          uses: actions/upload-artifact@v4
-          with:
-          name: fixed-MainActivity
-          path: MainActivity_fixed.kt
-          if-no-files-found: warn
-
-       - name: Upload APK
-         uses: actions/upload-artifact@v4
-         with:
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
           name: WorkCostCalculator-debug
           path: buildv14/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Upload fixed MainActivity
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixed-MainActivity
+          path: MainActivity_fixed.kt
+          if-no-files-found: warn
