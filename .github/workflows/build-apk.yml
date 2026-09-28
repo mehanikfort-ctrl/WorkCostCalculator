@@ -51,6 +51,10 @@ jobs:
         run: |
            cd buildv14
            sed -i 's/\bexpr\b/expression/g' app/src/main/java/com/example/workcost/MainActivity.kt
+      - name: Show lines 30 to 65
+        run: |
+          echo "===== LINES 30-65 ====="
+          sed -n '30,65p' buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
       - name: Build APK
         run: |
           cd buildv14
