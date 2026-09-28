@@ -36,23 +36,18 @@ jobs:
           echo "android.useAndroidX=true" >> gradle.properties
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
 
-      - name: Fix MainActivity.kt
+      - name: Save MainActivity for download
         run: |
           cd buildv14/app/src/main/java/com/example/workcost
+          cp MainActivity.kt $GITHUB_WORKSPACE/MainActivity_original.kt
           
-          # 1. Сначала удаляем проблемные строки 56-59 (чтобы они не мешали)
-          sed -i '56d' MainActivity.kt
-          sed -i '57d' MainActivity.kt
-          sed -i '58d' MainActivity.kt
-          sed -i '59d' MainActivity.kt
+      - name: Upload MainActivity for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: MainActivity-file
+          path: MainActivity_original.kt
+          if-no-files-found: warn
           
-          # 2. Заменяем строку 37 на безопасный пустой список формул
-          sed -i '37s/.*/val formulas = emptyList<FormulaEntity>()/' MainActivity.kt
-          
-          echo "=== ИСПРАВЛЕННЫЙ ФАЙЛ (строки 30-65) ==="
-          sed -n '30,65p' MainActivity.kt
-          echo "=== END ==="
-
       - name: Build APK
         run: |
           cd buildv14
