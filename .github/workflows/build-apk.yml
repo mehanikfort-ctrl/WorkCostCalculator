@@ -32,10 +32,6 @@ jobs:
       - name: Copy WorkData.kt to project
         run: |
           cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
-
-      - name: Copy WorkData.kt to project
-        run: |
-          cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
 
       - name: Fix Gradle properties
@@ -46,16 +42,6 @@ jobs:
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
           echo "org.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8" >> gradle.properties
 
-      - name: Fix MainActivity.kt
-        run: |
-          cd buildv14/app/src/main/java/com/example/workcost
-          
-          # 1. Удаляем проблемные строки 56-59
-          sed -i '56s/.*//' MainActivity.kt
-          sed -i '57s/.*//' MainActivity.kt
-          sed -i '58s/.*//' MainActivity.kt
-          sed -i '59s/.*//' MainActivity.kt
-          
           # 2. Исправляем ошибку 'expr' в строке 37
           # Заменяем эту строку на создание пустого списка формул
           sed -i '37s|.*|val formulas = emptyList<FormulaEntity>()|' MainActivity.kt
