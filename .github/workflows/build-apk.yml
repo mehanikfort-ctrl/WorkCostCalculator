@@ -33,8 +33,8 @@ jobs:
         run: |
           cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
 
-     - name: Copy WorkData.kt to project
-       run: |
+      - name: Copy WorkData.kt to project
+        run: |
           cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
 
