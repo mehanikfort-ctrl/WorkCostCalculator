@@ -29,6 +29,10 @@ jobs:
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
 
+      - name: Copy WorkData.kt to project
+        run: |
+          cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
+
       - name: Fix Gradle properties
         run: |
           cd buildv14
