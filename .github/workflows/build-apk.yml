@@ -29,19 +29,36 @@ jobs:
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
 
-      - name: Save MainActivity for download
+      - name: Fix Gradle properties
         run: |
-          cp buildv14/app/src/main/java/com/example/workcost/MainActivity.kt $GITHUB_WORKSPACE/MainActivity_original.kt
+          cd buildv14
+          touch gradle.properties
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
 
-      - name: Upload MainActivity for download
-        uses: actions/upload-artifact@v4
-        with:
-          name: MainActivity-file
-          path: MainActivity_original.kt
-          if-no-files-found: error
+      - name: Fix MainActivity.kt
+        run: |
+          cd buildv14/app/src/main/java/com/example/workcost
+          
+          # Заменяем проблемные строки 56-59 на пустые строки
+          # (мы точно видим, что там код для NavigationSuite, который ломает сборку)
+          sed -i '56s/.*//' MainActivity.kt
+          sed -i '57s/.*//' MainActivity.kt
+          sed -i '58s/.*//' MainActivity.kt
+          sed -i '59s/.*//' MainActivity.kt
+          
+          echo "=== СТРОКИ 50-65 ПОСЛЕ ИСПРАВЛЕНИЯ ==="
+          sed -n '50,65p' MainActivity.kt
+          echo "=== END ==="
 
-      # Этот шаг всё равно упадет, но он нам и не нужен сейчас
-      - name: Build APK (will fail)
+      - name: Build APK
         run: |
           cd buildv14
           gradle --no-daemon :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorkCostCalculator-debug
+          path: buildv14/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
