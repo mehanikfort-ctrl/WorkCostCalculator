@@ -40,15 +40,18 @@ jobs:
         run: |
           cd buildv14/app/src/main/java/com/example/workcost
           
-          # Заменяем проблемные строки 56-59 на пустые строки
-          # (мы точно видим, что там код для NavigationSuite, который ломает сборку)
+          # 1. Удаляем проблемные строки 56-59
           sed -i '56s/.*//' MainActivity.kt
           sed -i '57s/.*//' MainActivity.kt
           sed -i '58s/.*//' MainActivity.kt
           sed -i '59s/.*//' MainActivity.kt
           
-          echo "=== СТРОКИ 50-65 ПОСЛЕ ИСПРАВЛЕНИЯ ==="
-          sed -n '50,65p' MainActivity.kt
+          # 2. Исправляем ошибку 'expr' в строке 37
+          # Заменяем эту строку на создание пустого списка формул
+          sed -i '37s|.*|val formulas = emptyList<FormulaEntity>()|' MainActivity.kt
+          
+          echo "=== ИСПРАВЛЕННЫЙ ФАЙЛ (строки 30-65) ==="
+          sed -n '30,65p' MainActivity.kt
           echo "=== END ==="
 
       - name: Build APK
