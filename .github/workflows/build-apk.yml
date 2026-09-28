@@ -25,21 +25,9 @@ jobs:
         with:
           gradle-version: '8.13'
 
-      - name: Show files
-        run: |
-          pwd
-          find . -maxdepth 3 -type f | head -100
-
       - name: Unpack project
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
-          find . -maxdepth 3 -type f | head -100
-
-      - name: Show MainActivity
-        run: |
-          echo "===== MAINACTIVITY.KT ====="
-          cat buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
-          echo "===== END MAINACTIVITY.KT ====="
 
       - name: Fix Gradle properties
         run: |
@@ -52,37 +40,18 @@ jobs:
         run: |
           cd buildv14/app/src/main/java/com/example/workcost
           
-      - name: Fix MainActivity.kt
-          sed -i '56s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
-          sed -i '57s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
-          sed -i '58s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
-          sed -i '59s/.*/Spacer(Modifier.height(0.dp))/' MainActivity.kt
+          # 1. Сначала удаляем проблемные строки 56-59 (чтобы они не мешали)
+          sed -i '56d' MainActivity.kt
+          sed -i '57d' MainActivity.kt
+          sed -i '58d' MainActivity.kt
+          sed -i '59d' MainActivity.kt
+          
+          # 2. Заменяем строку 37 на безопасный пустой список формул
           sed -i '37s/.*/val formulas = emptyList<FormulaEntity>()/' MainActivity.kt
           
-          # 2. Убираем проблемные строки 56-59 (превращаем их в комментарии)
-          sed -i '56s/.*/\/\/ Удалено из-за ошибки компиляции/' MainActivity.kt
-          sed -i '57s/.*/\/\/ Удалено из-за ошибки компиляции/' MainActivity.kt
-          sed -i '58s/.*/\/\/ Удалено из-за ошибки компиляции/' MainActivity.kt
-          sed -i '59s/.*/\/\/ Удалено из-за ошибки компиляции/' MainActivity.kt
-          
-          echo "=== ИСПРАВЛЕННЫЕ СТРОКИ ==="
-          sed -n '35,60p' MainActivity.kt
+          echo "=== ИСПРАВЛЕННЫЙ ФАЙЛ (строки 30-65) ==="
+          sed -n '30,65p' MainActivity.kt
           echo "=== END ==="
-          sed -i '37s/.*/val formulas = emptyList<FormulaEntity>()/' MainActivity.kt
-          
-          # 2. Заменяем проблемные строки 56-59 на простой текст
-          # (вместо сложных Modifier.padding...)
-          sed -i '56s/.*/Text("Заглушка 1")/' MainActivity.kt
-          sed -i '57s/.*/Text("Заглушка 2")/' MainActivity.kt
-          sed -i '58s/.*/Text("Заглушка 3")/' MainActivity.kt
-          sed -i '59s/.*/Text("Заглушка 4")/' MainActivity.kt
-          
-          echo "=== ИСПРАВЛЕННЫЕ СТРОКИ ==="
-          sed -n '35,60p' MainActivity.kt
-          echo "=== END ==="
-          
-          # 3. Сохраняем исправленный файл для скачивания
-          cp MainActivity.kt $GITHUB_WORKSPACE/MainActivity_fixed.kt
 
       - name: Build APK
         run: |
@@ -95,10 +64,3 @@ jobs:
           name: WorkCostCalculator-debug
           path: buildv14/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
-      - name: Upload fixed MainActivity
-        uses: actions/upload-artifact@v4
-        with:
-          name: fixed-MainActivity
-          path: MainActivity_fixed.kt
-          if-no-files-found: warn
