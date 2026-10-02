@@ -47,7 +47,14 @@ fun AppNavigation() {
             )
         }
 
-        "estimates" -> PlaceholderScreen("Мои сметы", onBack = { currentScreen = "menu" })
+        "estimates" -> EstimatesListScreen(
+            onBack = { currentScreen = "menu" },
+            onOpenEstimate = { estimate ->
+                currentEstimate = estimate
+                currentScreen = "works"
+            }
+        )
+
         "settings" -> PlaceholderScreen("Настройки", onBack = { currentScreen = "menu" })
     }
 }
