@@ -40,6 +40,23 @@ jobs:
           cp EstimateStorage.kt buildv14/app/src/main/java/com/example/workcost/EstimateStorage.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
 
+      - name: Update AndroidManifest.xml
+        run: |
+          cd buildv14
+          # Добавляем FileProvider в манифест
+          sed -i 's|</application>|<provider\n            android:name="androidx.core.content.FileProvider"\n            android:authorities="${applicationId}.fileprovider"\n            android:exported="false"\n            android:grantUriPermissions="true">\n            <meta-data\n                android:name="android.support.FILE_PROVIDER_PATHS"\n                android:resource="@xml/file_paths" />\n        </provider>\n    </application>|' app/src/main/AndroidManifest.xml
+
+      - name: Create file_paths.xml
+        run: |
+          cd buildv14
+          mkdir -p app/src/main/res/xml
+          cat > app/src/main/res/xml/file_paths.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <paths>
+              <cache-path name="cache" path="." />
+          </paths>
+          EOF
+          
       - name: Fix Gradle properties
         run: |
           cd buildv14
