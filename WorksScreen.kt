@@ -12,6 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.content.Intent
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun WorksScreen(
@@ -36,7 +42,57 @@ fun WorksScreen(
         }
         EstimateStorage.saveAll(context, allEstimates)
     }
+    // Функция экспорта сметы в текстовый файл
+    fun exportEstimate() {
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy_HH-mm", Locale.getDefault())
+        val fileName = "smeta_${estimate.name.replace(" ", "_")}_${dateFormat.format(Date())}.txt"
+        
+        val content = buildString {
+            appendLine("=====================================")
+            appendLine("СМЕТА НА ВЫПОЛНЕНИЕ РАБОТ")
+            appendLine("=====================================")
+            appendLine()
+            appendLine("Объект: ${estimate.name}")
+            appendLine("Заказчик: ${estimate.customer}")
+            appendLine("Адрес: ${estimate.address}")
+            appendLine("Дата: ${estimate.date}")
+            appendLine()
+            appendLine("-------------------------------------")
+            appendLine("№  Наименование работ")
+            appendLine("-------------------------------------")
+            
+            estimate.items.forEachIndexed { index, item ->
+                appendLine("${index + 1}. ${item.name}")
+                appendLine("   ${item.quantity} ${item.unit} × ${item.price} ₽ = ${"%.2f".format(item.sum())} ₽")
+            }
+            
+            appendLine("-------------------------------------")
+            appendLine("ИТОГО: ${"%.2f".format(estimate.totalSum())} ₽")
+            appendLine("=====================================")
+            appendLine()
+            appendLine("Смета сформирована в приложении «Калькулятор смет»")
+        }
 
+        // Сохраняем файл во внутреннюю папку приложения
+        val file = File(context.cacheDir, fileName)
+        file.writeText(content)
+
+        // Открываем меню "Поделиться"
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file
+        )
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "Смета: ${estimate.name}")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        context.startActivity(Intent.createChooser(intent, "Отправить смету"))
+    }
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = {
