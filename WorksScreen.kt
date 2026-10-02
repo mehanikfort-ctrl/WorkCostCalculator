@@ -21,9 +21,11 @@ fun WorksScreen(
     val categories = listOf("Строительные", "Земляные", "Электрика", "Кровля")
     var searchQuery by remember { mutableStateOf("") }
     var showEstimateDialog by remember { mutableStateOf(false) }
+    
+    // Ключевое изменение: используем state для отслеживания изменений
+    var refreshTrigger by remember { mutableStateOf(0) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        // Верхняя панель с кнопкой "Назад" и названием сметы
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text("← Назад") }
             Text(
@@ -36,7 +38,6 @@ fun WorksScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Строка поиска
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -47,7 +48,6 @@ fun WorksScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Кнопки вкладок (категорий)
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             categories.forEachIndexed { index, title ->
                 Button(
@@ -66,56 +66,62 @@ fun WorksScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Список работ
         val currentCategory = categories[selectedTab]
         val filteredWorks = WorkRepository.allWorks.filter {
             it.category == currentCategory &&
             (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
         }
 
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(filteredWorks) { work ->
-                val existingItem = estimate.items.find { it.workId == work.id }
-                val isSelected = existingItem != null
-                val volume = existingItem?.quantity?.toString() ?: ""
-                val price = existingItem?.price?.toString() ?: work.price.toString()
+        // Ключевое изменение: key(refreshTrigger) заставляет перерисовывать список
+        key(refreshTrigger) {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filteredWorks, key = { it.id }) { work ->
+                    val existingItem = estimate.items.find { it.workId == work.id }
+                    val isSelected = existingItem != null
 
-                WorkRow(
-                    work = work,
-                    isSelected = isSelected,
-                    volume = volume,
-                    price = price,
-                    onToggle = {
-                        if (isSelected) {
-                            estimate.items.remove(existingItem)
-                        } else {
-                            estimate.items.add(
-                                EstimateItem(
-                                    workId = work.id,
-                                    name = work.name,
-                                    unit = work.unit,
-                                    price = work.price,
-                                    quantity = 0.0
+                    WorkRow(
+                        work = work,
+                        isSelected = isSelected,
+                        volume = existingItem?.quantity?.toString() ?: "",
+                        price = existingItem?.price?.toString() ?: work.price.toString(),
+                        onToggle = {
+                            if (isSelected) {
+                                estimate.items.remove(existingItem)
+                            } else {
+                                estimate.items.add(
+                                    EstimateItem(
+                                        workId = work.id,
+                                        name = work.name,
+                                        unit = work.unit,
+                                        price = work.price,
+                                        quantity = 0.0
+                                    )
                                 )
-                            )
+                            }
+                            refreshTrigger++ // Принудительно обновляем UI
+                        },
+                        onVolumeChange = { newVolume ->
+                            existingItem?.let {
+                                it.quantity = newVolume.toDoubleOrNull() ?: 0.0
+                                refreshTrigger++
+                            }
+                        },
+                        onPriceChange = { newPrice ->
+                            existingItem?.let {
+                                it.price = newPrice.toDoubleOrNull() ?: work.price
+                                refreshTrigger++
+                            }
                         }
-                    },
-                    onVolumeChange = { newVolume ->
-                        existingItem?.quantity = newVolume.toDoubleOrNull() ?: 0.0
-                    },
-                    onPriceChange = { newPrice ->
-                        existingItem?.price = newPrice.toDoubleOrNull() ?: work.price
-                    }
-                )
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Кнопка "Сформировать смету"
         Button(
             onClick = { showEstimateDialog = true },
             modifier = Modifier.fillMaxWidth()
@@ -124,7 +130,6 @@ fun WorksScreen(
         }
     }
 
-    // Диалог со сметой
     if (showEstimateDialog) {
         AlertDialog(
             onDismissRequest = { showEstimateDialog = false },
@@ -181,14 +186,16 @@ fun WorkRow(
                     onValueChange = onVolumeChange,
                     label = { Text("Объём") },
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = isSelected
                 )
                 OutlinedTextField(
                     value = price,
                     onValueChange = onPriceChange,
                     label = { Text("Цена") },
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = isSelected
                 )
             }
         }
