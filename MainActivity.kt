@@ -41,7 +41,7 @@ fun AppNavigation() {
         )
 
         "works" -> currentEstimate?.let { estimate ->
-            WorksScreenWrapper(
+            WorksScreen(
                 estimate = estimate,
                 onBack = { currentScreen = "menu" }
             )
@@ -67,27 +67,5 @@ fun PlaceholderScreen(title: String, onBack: () -> Unit) {
         Button(onClick = onBack) {
             Text("Назад в меню")
         }
-    }
-}
-
-@Composable
-fun WorksScreenWrapper(estimate: Estimate, onBack: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("← Назад") }
-            Text(
-                text = estimate.name,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Text("Здесь будет выбор работ для сметы.")
-        Text("Название: ${estimate.name}")
-        Text("Заказчик: ${estimate.customer}")
-        Text("Адрес: ${estimate.address}")
-        Text("Дата: ${estimate.date}")
     }
 }
