@@ -42,14 +42,6 @@ jobs:
           echo "kotlin.jvm.target.validation.mode=warning" >> gradle.properties
           echo "org.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8" >> gradle.properties
 
-          # 2. Исправляем ошибку 'expr' в строке 37
-          # Заменяем эту строку на создание пустого списка формул
-          sed -i '37s|.*|val formulas = emptyList<FormulaEntity>()|' MainActivity.kt
-          
-          echo "=== ИСПРАВЛЕННЫЙ ФАЙЛ (строки 30-65) ==="
-          sed -n '30,65p' MainActivity.kt
-          echo "=== END ==="
-
       - name: Build APK
         run: |
           cd buildv14
