@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -17,17 +18,31 @@ fun WorksScreen(
     estimate: Estimate,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var selectedTab by remember { mutableStateOf(0) }
     val categories = listOf("Строительные", "Земляные", "Электрика", "Кровля")
     var searchQuery by remember { mutableStateOf("") }
     var showEstimateDialog by remember { mutableStateOf(false) }
-    
-    // Ключевое изменение: используем state для отслеживания изменений
     var refreshTrigger by remember { mutableStateOf(0) }
+
+    // Функция для сохранения текущей сметы в хранилище
+    fun saveCurrentEstimate() {
+        val allEstimates = EstimateStorage.loadAll(context)
+        val index = allEstimates.indexOfFirst { it.id == estimate.id }
+        if (index >= 0) {
+            allEstimates[index] = estimate
+        } else {
+            allEstimates.add(estimate)
+        }
+        EstimateStorage.saveAll(context, allEstimates)
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("← Назад") }
+            TextButton(onClick = {
+                saveCurrentEstimate() // Сохраняем перед выходом
+                onBack()
+            }) { Text("← Назад") }
             Text(
                 text = estimate.name,
                 style = MaterialTheme.typography.titleLarge,
@@ -72,7 +87,6 @@ fun WorksScreen(
             (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
         }
 
-        // Ключевое изменение: key(refreshTrigger) заставляет перерисовывать список
         key(refreshTrigger) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -101,18 +115,21 @@ fun WorksScreen(
                                     )
                                 )
                             }
-                            refreshTrigger++ // Принудительно обновляем UI
+                            refreshTrigger++
+                            saveCurrentEstimate() // Автосохранение
                         },
                         onVolumeChange = { newVolume ->
                             existingItem?.let {
                                 it.quantity = newVolume.toDoubleOrNull() ?: 0.0
                                 refreshTrigger++
+                                saveCurrentEstimate() // Автосохранение
                             }
                         },
                         onPriceChange = { newPrice ->
                             existingItem?.let {
                                 it.price = newPrice.toDoubleOrNull() ?: work.price
                                 refreshTrigger++
+                                saveCurrentEstimate() // Автосохранение
                             }
                         }
                     )
