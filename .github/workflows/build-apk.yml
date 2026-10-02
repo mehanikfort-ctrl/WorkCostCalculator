@@ -35,6 +35,7 @@ jobs:
           cp Estimate.kt buildv14/app/src/main/java/com/example/workcost/Estimate.kt
           cp MainMenuScreen.kt buildv14/app/src/main/java/com/example/workcost/MainMenuScreen.kt
           cp CreateEstimateScreen.kt buildv14/app/src/main/java/com/example/workcost/CreateEstimateScreen.kt
+          cp WorksScreen.kt buildv14/app/src/main/java/com/example/workcost/WorksScreen.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
 
       - name: Fix Gradle properties
