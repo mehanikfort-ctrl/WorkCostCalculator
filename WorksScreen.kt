@@ -8,6 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Landscape
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +35,13 @@ fun WorksScreen(
 ) {
     val context = LocalContext.current
     var selectedTab by remember { mutableStateOf(0) }
-    val categories = listOf("Строительные", "Земляные", "Электрика", "Кровля")
+    val categories = remember { WorkRepository.getAllCategories(context) }
+    val categoryIcons = listOf(
+        Icons.Default.Build,     // Строительные
+        Icons.Default.Landscape, // Земляные
+        Icons.Default.FlashOn,   // Электрика
+        Icons.Default.Home       // Кровля
+    )
     var searchQuery by remember { mutableStateOf("") }
     var showEstimateDialog by remember { mutableStateOf(false) }
 
@@ -123,17 +136,20 @@ fun WorksScreen(
 
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             categories.forEachIndexed { index, title ->
-                Button(
+                val icon = if (index < categoryIcons.size) categoryIcons[index] else Icons.Default.Build
+                FilterChip(
+                    selected = selectedTab == index,
                     onClick = { selectedTab = index },
-                    modifier = Modifier.padding(end = 8.dp),
-                    colors = if (selectedTab == index) {
-                        ButtonDefaults.buttonColors()
-                    } else {
-                        ButtonDefaults.outlinedButtonColors()
-                    }
-                ) {
-                    Text(title)
-                }
+                    label = { Text(title) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = title,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    modifier = Modifier.padding(end = 8.dp)
+                )
             }
         }
 
@@ -221,12 +237,16 @@ fun WorksScreen(
                 onClick = { showEstimateDialog = true },
                 modifier = Modifier.weight(1f)
             ) {
+                Icon(Icons.Default.List, contentDescription = "Смета", modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text("Смета")
             }
             Button(
                 onClick = { exportEstimate() },
                 modifier = Modifier.weight(1f)
             ) {
+                Icon(Icons.Default.Share, contentDescription = "Поделиться", modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text("Поделиться")
             }
         }
