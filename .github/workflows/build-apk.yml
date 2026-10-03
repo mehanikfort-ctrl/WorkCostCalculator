@@ -70,6 +70,11 @@ jobs:
           python3 << 'EOF'
           from PIL import Image
           import os
+      - name: Copy logo to drawable
+        run: |
+          cd buildv14
+          mkdir -p app/src/main/res/drawable
+          cp ../b342691e-908f-4f78-a4af-5788cef786ff.png app/src/main/res/drawable/logo.png
 
           # Загружаем логотип из корня репозитория
           logo_path = '../b342691e-908f-4f78-a4af-5788cef786ff.png'
