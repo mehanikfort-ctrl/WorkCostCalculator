@@ -78,7 +78,7 @@ jobs:
       - name: Add Icons dependency
         run: |
           cd buildv14
-          sed -i '/dependencies {/a \    implementation("androidx.compose.material:material-icons-extended:1.5.4")' app/build.gradle
+          sed -i '/dependencies {/a \    implementation("androidx.compose.material:material-icons-extended:1.5.4")' app/build.gradle.kts")' app/build.gradle
 
       - name: Build APK
         run: |
