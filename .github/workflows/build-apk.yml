@@ -66,10 +66,21 @@ jobs:
       - name: Generate app icons from logo
         run: |
           cd buildv14
-          pip install Pillow
-          python3 << 'EOF'
-          from PIL import Image
-          import os
+          sudo apt-get update && sudo apt-get install -y imagemagick
+          LOGO="../b342691e-908f-4f78-a4af-5788cef786ff.png"
+          for size in 48 72 96 144 192; do
+            case $size in
+              48) folder="mipmap-mdpi" ;;
+              72) folder="mipmap-hdpi" ;;
+              96) folder="mipmap-xhdpi" ;;
+              144) folder="mipmap-xxhdpi" ;;
+              192) folder="mipmap-xxxhdpi" ;;
+            esac
+            mkdir -p "app/src/main/res/$folder"
+            convert "$LOGO" -resize ${size}x${size} "app/src/main/res/$folder/ic_launcher.png"
+            convert "$LOGO" -resize ${size}x${size} "app/src/main/res/$folder/ic_launcher_round.png"
+          done
+          echo "Icons generated successfully"
       - name: Copy logo to drawable
         run: |
           cd buildv14
