@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Landscape
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -227,27 +228,40 @@ fun WorksScreen(
             }
         }
 
+               Spacer(modifier = Modifier.height(8.dp))
+
+        // Первый ряд — кнопка "Смета" на всю ширину
+        Button(
+            onClick = { showEstimateDialog = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(Icons.Default.List, contentDescription = "Смета", modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("Показать смету")
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Второй ряд — две кнопки: PDF и Текст
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Button(
-                onClick = { showEstimateDialog = true },
+                onClick = { PdfExporter.sharePdf(context, estimate) },
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.List, contentDescription = "Смета", modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Смета")
+                Text("PDF")
             }
-            Button(
+            OutlinedButton(
                 onClick = { exportEstimate() },
                 modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.Share, contentDescription = "Поделиться", modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Share, contentDescription = "Текст", modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Поделиться")
+                Text("Текст")
             }
         }
     }
