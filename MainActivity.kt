@@ -1,37 +1,29 @@
 package com.example.workcost
 
 import android.os.Bundle
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Включаем полноэкранный режим (прячем системные кнопки)
-        enableImmersiveMode()
+        // Включаем полноэкранный режим
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
         
         setContent {
             MaterialTheme {
                 AppNavigation()
             }
-        }
-    }
-
-    private fun enableImmersiveMode() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, window.decorView).apply {
-            hide(WindowInsetsCompat.Type.systemBars())
-            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 }
@@ -72,7 +64,12 @@ fun AppNavigation() {
         )
 
         "settings" -> SettingsScreen(
-            onBack = { currentScreen = "menu" }
+            onBack = { currentScreen = "menu" },
+            onManageWorks = { currentScreen = "manage" }
+        )
+
+        "manage" -> ManageWorksScreen(
+            onBack = { currentScreen = "settings" }
         )
     }
 }
