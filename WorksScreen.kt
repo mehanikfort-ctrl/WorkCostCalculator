@@ -29,7 +29,10 @@ fun WorksScreen(
     val categories = listOf("Строительные", "Земляные", "Электрика", "Кровля")
     var searchQuery by remember { mutableStateOf("") }
     var showEstimateDialog by remember { mutableStateOf(false) }
-    var refreshTrigger by remember { mutableStateOf(0) }
+
+    // Сохраняем тексты ввода отдельно — это решает проблему с фокусом
+    val volumeInputs = remember { mutableStateMapOf<Int, String>() }
+    val priceInputs = remember { mutableStateMapOf<Int, String>() }
 
     fun saveCurrentEstimate() {
         val allEstimates = EstimateStorage.loadAll(context)
@@ -136,58 +139,63 @@ fun WorksScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         val currentCategory = categories[selectedTab]
-        val filteredWorks = WorkRepository.getWorks(context).filter {
+        val allWorks = remember { WorkRepository.getWorks(context) }
+        val filteredWorks = allWorks.filter {
             it.category == currentCategory &&
             (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
         }
 
-        key(refreshTrigger) {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filteredWorks, key = { it.id }) { work ->
-                    val existingItem = estimate.items.find { it.workId == work.id }
-                    val isSelected = existingItem != null
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(filteredWorks, key = { it.id }) { work ->
+                val existingItem = estimate.items.find { it.workId == work.id }
+                val isSelected = existingItem != null
 
-                    WorkRow(
-                        work = work,
-                        isSelected = isSelected,
-                        volume = existingItem?.quantity?.toString() ?: "",
-                        price = existingItem?.price?.toString() ?: work.price.toString(),
-                        onToggle = {
-                            if (isSelected) {
-                                estimate.items.remove(existingItem)
-                            } else {
-                                estimate.items.add(
-                                    EstimateItem(
-                                        workId = work.id,
-                                        name = work.name,
-                                        unit = work.unit,
-                                        price = work.price,
-                                        quantity = 0.0
-                                    )
-                                )
-                            }
-                            refreshTrigger++
-                            saveCurrentEstimate()
-                        },
-                        onVolumeChange = { newVolume ->
-                            existingItem?.let {
-                                it.quantity = newVolume.toDoubleOrNull() ?: 0.0
-                                refreshTrigger++
-                                saveCurrentEstimate()
-                            }
-                        },
-                        onPriceChange = { newPrice ->
-                            existingItem?.let {
-                                it.price = newPrice.toDoubleOrNull() ?: work.price
-                                refreshTrigger++
-                                saveCurrentEstimate()
-                            }
-                        }
-                    )
+                // Инициализируем поля ввода при первом показе
+                LaunchedEffect(work.id, isSelected) {
+                    if (isSelected) {
+                        volumeInputs.putIfAbsent(work.id, existingItem?.quantity?.toString() ?: "")
+                        priceInputs.putIfAbsent(work.id, existingItem?.price?.toString() ?: work.price.toString())
+                    } else {
+                        volumeInputs.remove(work.id)
+                        priceInputs.remove(work.id)
+                    }
                 }
+
+                WorkRow(
+                    work = work,
+                    isSelected = isSelected,
+                    volume = volumeInputs[work.id] ?: "",
+                    price = priceInputs[work.id] ?: work.price.toString(),
+                    onToggle = {
+                        if (isSelected) {
+                            estimate.items.remove(existingItem)
+                        } else {
+                            estimate.items.add(
+                                EstimateItem(
+                                    workId = work.id,
+                                    name = work.name,
+                                    unit = work.unit,
+                                    price = work.price,
+                                    quantity = 0.0
+                                )
+                            )
+                        }
+                        saveCurrentEstimate()
+                    },
+                    onVolumeChange = { newVolume ->
+                        volumeInputs[work.id] = newVolume
+                        existingItem?.quantity = newVolume.toDoubleOrNull() ?: 0.0
+                        saveCurrentEstimate()
+                    },
+                    onPriceChange = { newPrice ->
+                        priceInputs[work.id] = newPrice
+                        existingItem?.price = newPrice.toDoubleOrNull() ?: work.price
+                        saveCurrentEstimate()
+                    }
+                )
             }
         }
 
