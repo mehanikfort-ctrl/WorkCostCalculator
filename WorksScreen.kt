@@ -195,11 +195,23 @@ fun WorksScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = { showEstimateDialog = true },
-            modifier = Modifier.fillMaxWidth()
+               Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Сформировать смету")
+            Button(
+                onClick = { showEstimateDialog = true },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Смета")
+            }
+            Button(
+                onClick = { exportEstimate() },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Поделиться")
+            }
+        }
         }
     }
 
