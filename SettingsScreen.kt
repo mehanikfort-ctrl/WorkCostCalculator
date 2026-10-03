@@ -13,7 +13,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onManageWorks: () -> Unit
 ) {
     val context = LocalContext.current
     var refreshTrigger by remember { mutableStateOf(0) }
@@ -34,13 +35,21 @@ fun SettingsScreen(
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             "Нажмите на цену, чтобы изменить её.",
             style = MaterialTheme.typography.bodyMedium
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { onManageWorks() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Управление работами и разделами")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Spacer(modifier = Modifier.height(8.dp))
 
