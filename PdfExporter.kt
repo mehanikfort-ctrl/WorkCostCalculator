@@ -2,6 +2,8 @@ package com.example.workcost
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
@@ -62,6 +64,23 @@ object PdfExporter {
         var canvas = page.canvas
 
         var y = MARGIN + 60f
+
+        // === ЛОГОТИП В ПРАВОМ ВЕРХНЕМ УГЛУ ===
+        try {
+            val logoId = context.resources.getIdentifier("logo", "drawable", context.packageName)
+            if (logoId != 0) {
+                val bitmap = BitmapFactory.decodeResource(context.resources, logoId)
+                if (bitmap != null) {
+                    val logoSize = 80
+                    val logoX = PAGE_WIDTH - MARGIN - logoSize
+                    val logoY = MARGIN.toInt()
+                    val scaledLogo = Bitmap.createScaledBitmap(bitmap, logoSize, logoSize, true)
+                    canvas.drawBitmap(scaledLogo, logoX.toFloat(), logoY.toFloat(), null)
+                }
+            }
+        } catch (e: Exception) {
+            // Если логотип не найден — просто пропускаем
+        }
 
         // Заголовок
         canvas.drawText("СМЕТА НА ВЫПОЛНЕНИЕ РАБОТ", MARGIN, y, titlePaint)
