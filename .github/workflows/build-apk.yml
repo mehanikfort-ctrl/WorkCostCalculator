@@ -48,8 +48,9 @@ jobs:
           cp CustomWork.kt buildv14/app/src/main/java/com/example/workcost/CustomWork.kt
           cp CustomWorkStorage.kt buildv14/app/src/main/java/com/example/workcost/CustomWorkStorage.kt
           cp ManageWorksScreen.kt buildv14/app/src/main/java/com/example/workcost/ManageWorksScreen.kt
+          cp Theme.kt buildv14/app/src/main/java/com/example/workcost/Theme.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
-
+          
       - name: Update AndroidManifest.xml
         run: |
           cd buildv14
