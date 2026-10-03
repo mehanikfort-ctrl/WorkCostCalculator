@@ -2,10 +2,15 @@ package com.example.workcost
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -30,21 +35,24 @@ fun MainMenuScreen(
         )
 
         MenuCard(
-            title = "➕ НОВАЯ СМЕТА",
+            icon = Icons.Default.Add,
+            title = "НОВАЯ СМЕТА",
             description = "Создать новую смету для объекта",
             onClick = onCreateEstimate
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         MenuCard(
-            title = "📋 МОИ СМЕТЫ",
+            icon = Icons.Default.List,
+            title = "МОИ СМЕТЫ",
             description = "Просмотр сохранённых смет",
             onClick = onShowEstimates
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         MenuCard(
-            title = "⚙️ НАСТРОЙКИ",
+            icon = Icons.Default.Settings,
+            title = "НАСТРОЙКИ",
             description = "Цены, разделы, работы",
             onClick = onShowSettings
         )
@@ -53,6 +61,7 @@ fun MainMenuScreen(
 
 @Composable
 fun MenuCard(
+    icon: ImageVector,
     title: String,
     description: String,
     onClick: () -> Unit
@@ -62,10 +71,22 @@ fun MenuCard(
         shape = RoundedCornerShape(16.dp),
         onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, style = MaterialTheme.typography.bodyMedium)
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = description, style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
