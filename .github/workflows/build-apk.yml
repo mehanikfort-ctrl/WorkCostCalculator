@@ -78,7 +78,17 @@ jobs:
       - name: Add Icons dependency
         run: |
           cd buildv14
-          sed -i '/dependencies {/a \    implementation("androidx.compose.material:material-icons-extended:1.5.4")' app/build.gradle.kts")' app/build.gradle
+          python3 -c "
+          import re
+          path = 'app/build.gradle.kts'
+          with open(path, 'r') as f:
+              content = f.read()
+          if 'material-icons-extended' not in content:
+              content = content.replace('dependencies {', 'dependencies {\n    implementation(\"androidx.compose.material:material-icons-extended:1.5.4\")', 1)
+              with open(path, 'w') as f:
+                  f.write(content)
+          print('Icons dependency added')
+          "
 
       - name: Build APK
         run: |
