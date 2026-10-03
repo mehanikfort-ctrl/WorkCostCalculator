@@ -136,7 +136,7 @@ fun WorksScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         val currentCategory = categories[selectedTab]
-        val filteredWorks = WorkRepository.allWorks.filter {
+        val filteredWorks = WorkRepository.getWorks(context).filter {
             it.category == currentCategory &&
             (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
         }
