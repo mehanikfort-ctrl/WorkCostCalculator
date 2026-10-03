@@ -18,7 +18,7 @@ fun ManageWorksScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     var refreshTrigger by remember { mutableStateOf(0) }
     val categories = remember(refreshTrigger) { WorkRepository.getAllCategories(context) }
-    val allWorks = remember(refreshTrigger) { WorkRepository.getWorks(context) }
+    val customCategories = remember(refreshTrigger) { CustomWorkStorage.loadCategories(context) }
     val customWorks = remember(refreshTrigger) { CustomWorkStorage.loadWorks(context) }
 
     var showAddDialog by remember { mutableStateOf(false) }
@@ -54,6 +54,39 @@ fun ManageWorksScreen(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // === МОИ РАЗДЕЛЫ ===
+        Text("Мои разделы (${customCategories.size})", fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (customCategories.isEmpty()) {
+            Text("У вас пока нет своих разделов.")
+        } else {
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 200.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(customCategories, key = { it.id }) { category ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(category.name, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            TextButton(onClick = {
+                                CustomWorkStorage.deleteCategory(context, category.name)
+                                refreshTrigger++
+                            }) {
+                                Text("Удалить")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // === МОИ РАБОТЫ ===
         Text("Мои работы (${customWorks.size})", fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
 
