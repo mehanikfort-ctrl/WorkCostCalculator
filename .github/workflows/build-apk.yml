@@ -29,6 +29,11 @@ jobs:
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
 
+      - name: Show project structure
+        run: |
+          find buildv14 -name "build.gradle*" -type f
+          find buildv14 -name "AndroidManifest.xml" -type f
+
       - name: Copy source files to project
         run: |
           cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
