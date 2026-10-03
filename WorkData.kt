@@ -1,5 +1,7 @@
 package com.example.workcost
 
+import android.content.Context
+
 data class WorkItem(
     val id: Int,
     val category: String,
@@ -9,7 +11,7 @@ data class WorkItem(
 )
 
 object WorkRepository {
-    val allWorks = listOf(
+    val defaultWorks = listOf(
         WorkItem(1, "Строительные", "Кладка газобетонных блоков (на клей)", "м2", 360.0),
         WorkItem(2, "Строительные", "Кладка перегородок из ПГП", "м2", 450.0),
         WorkItem(3, "Строительные", "Кладка облицовочного кирпича", "м2", 1500.0),
@@ -36,4 +38,15 @@ object WorkRepository {
         WorkItem(24, "Кровля", "Монтаж утепленной кровли из металлочерепицы", "м2", 1200.0),
         WorkItem(25, "Кровля", "Монтаж водосточной системы", "п.м.", 450.0)
     )
+
+    // Эта функция возвращает работы с учётом изменённых цен
+    fun getWorks(context: Context): List<WorkItem> {
+        val savedPrices = PriceStorage.loadPrices(context)
+        return defaultWorks.map { work ->
+            work.copy(price = savedPrices[work.id] ?: work.price)
+        }
+    }
+
+    // Для обратной совместимости — возвращает стандартные цены
+    val allWorks: List<WorkItem> get() = defaultWorks
 }
