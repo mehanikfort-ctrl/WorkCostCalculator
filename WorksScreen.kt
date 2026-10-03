@@ -1,5 +1,6 @@
 package com.example.workcost
 
+import android.content.Intent
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import android.content.Intent
 import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
@@ -31,7 +31,6 @@ fun WorksScreen(
     var showEstimateDialog by remember { mutableStateOf(false) }
     var refreshTrigger by remember { mutableStateOf(0) }
 
-    // Функция для сохранения текущей сметы в хранилище
     fun saveCurrentEstimate() {
         val allEstimates = EstimateStorage.loadAll(context)
         val index = allEstimates.indexOfFirst { it.id == estimate.id }
@@ -42,11 +41,11 @@ fun WorksScreen(
         }
         EstimateStorage.saveAll(context, allEstimates)
     }
-    // Функция экспорта сметы в текстовый файл
+
     fun exportEstimate() {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy_HH-mm", Locale.getDefault())
         val fileName = "smeta_${estimate.name.replace(" ", "_")}_${dateFormat.format(Date())}.txt"
-        
+
         val content = buildString {
             appendLine("=====================================")
             appendLine("СМЕТА НА ВЫПОЛНЕНИЕ РАБОТ")
@@ -60,12 +59,12 @@ fun WorksScreen(
             appendLine("-------------------------------------")
             appendLine("№  Наименование работ")
             appendLine("-------------------------------------")
-            
+
             estimate.items.forEachIndexed { index, item ->
                 appendLine("${index + 1}. ${item.name}")
                 appendLine("   ${item.quantity} ${item.unit} × ${item.price} ₽ = ${"%.2f".format(item.sum())} ₽")
             }
-            
+
             appendLine("-------------------------------------")
             appendLine("ИТОГО: ${"%.2f".format(estimate.totalSum())} ₽")
             appendLine("=====================================")
@@ -73,11 +72,9 @@ fun WorksScreen(
             appendLine("Смета сформирована в приложении «Калькулятор смет»")
         }
 
-        // Сохраняем файл во внутреннюю папку приложения
         val file = File(context.cacheDir, fileName)
         file.writeText(content)
 
-        // Открываем меню "Поделиться"
         val uri = FileProvider.getUriForFile(
             context,
             "${context.packageName}.fileprovider",
@@ -93,10 +90,11 @@ fun WorksScreen(
 
         context.startActivity(Intent.createChooser(intent, "Отправить смету"))
     }
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = {
-                saveCurrentEstimate() // Сохраняем перед выходом
+                saveCurrentEstimate()
                 onBack()
             }) { Text("← Назад") }
             Text(
@@ -172,20 +170,20 @@ fun WorksScreen(
                                 )
                             }
                             refreshTrigger++
-                            saveCurrentEstimate() // Автосохранение
+                            saveCurrentEstimate()
                         },
                         onVolumeChange = { newVolume ->
                             existingItem?.let {
                                 it.quantity = newVolume.toDoubleOrNull() ?: 0.0
                                 refreshTrigger++
-                                saveCurrentEstimate() // Автосохранение
+                                saveCurrentEstimate()
                             }
                         },
                         onPriceChange = { newPrice ->
                             existingItem?.let {
                                 it.price = newPrice.toDoubleOrNull() ?: work.price
                                 refreshTrigger++
-                                saveCurrentEstimate() // Автосохранение
+                                saveCurrentEstimate()
                             }
                         }
                     )
@@ -195,7 +193,7 @@ fun WorksScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -211,7 +209,6 @@ fun WorksScreen(
             ) {
                 Text("Поделиться")
             }
-        }
         }
     }
 
