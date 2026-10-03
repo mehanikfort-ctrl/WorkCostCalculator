@@ -43,13 +43,11 @@ object WorkRepository {
         WorkItem(25, "Кровля", "Монтаж водосточной системы", "п.м.", 450.0)
     )
 
-    // Все разделы (стандартные + пользовательские)
     fun getAllCategories(context: Context): List<String> {
         val custom = CustomWorkStorage.loadCategories(context).map { it.name }
         return defaultCategories + custom
     }
 
-    // Все работы (стандартные + пользовательские) с учётом изменённых цен
     fun getWorks(context: Context): List<WorkItem> {
         val savedPrices = PriceStorage.loadPrices(context)
         val standard = defaultWorks.map { work ->
@@ -69,6 +67,5 @@ object WorkRepository {
         return standard + custom
     }
 
-    // Для обратной совместимости
     val allWorks: List<WorkItem> get() = defaultWorks
 }
