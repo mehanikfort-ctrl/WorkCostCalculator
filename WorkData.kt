@@ -7,10 +7,14 @@ data class WorkItem(
     val category: String,
     val name: String,
     val unit: String,
-    var price: Double
+    var price: Double,
+    val isCustom: Boolean = false,
+    val customId: Long = 0L
 )
 
 object WorkRepository {
+    val defaultCategories = listOf("Строительные", "Земляные", "Электрика", "Кровля")
+
     val defaultWorks = listOf(
         WorkItem(1, "Строительные", "Кладка газобетонных блоков (на клей)", "м2", 360.0),
         WorkItem(2, "Строительные", "Кладка перегородок из ПГП", "м2", 450.0),
@@ -39,14 +43,32 @@ object WorkRepository {
         WorkItem(25, "Кровля", "Монтаж водосточной системы", "п.м.", 450.0)
     )
 
-    // Эта функция возвращает работы с учётом изменённых цен
-    fun getWorks(context: Context): List<WorkItem> {
-        val savedPrices = PriceStorage.loadPrices(context)
-        return defaultWorks.map { work ->
-            work.copy(price = savedPrices[work.id] ?: work.price)
-        }
+    // Все разделы (стандартные + пользовательские)
+    fun getAllCategories(context: Context): List<String> {
+        val custom = CustomWorkStorage.loadCategories(context).map { it.name }
+        return defaultCategories + custom
     }
 
-    // Для обратной совместимости — возвращает стандартные цены
+    // Все работы (стандартные + пользовательские) с учётом изменённых цен
+    fun getWorks(context: Context): List<WorkItem> {
+        val savedPrices = PriceStorage.loadPrices(context)
+        val standard = defaultWorks.map { work ->
+            work.copy(price = savedPrices[work.id] ?: work.price)
+        }
+        val custom = CustomWorkStorage.loadWorks(context).map { customWork ->
+            WorkItem(
+                id = customWork.id.toInt(),
+                category = customWork.category,
+                name = customWork.name,
+                unit = customWork.unit,
+                price = customWork.price,
+                isCustom = true,
+                customId = customWork.id
+            )
+        }
+        return standard + custom
+    }
+
+    // Для обратной совместимости
     val allWorks: List<WorkItem> get() = defaultWorks
 }
