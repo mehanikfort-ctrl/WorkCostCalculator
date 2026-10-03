@@ -40,6 +40,9 @@ jobs:
           cp EstimateStorage.kt buildv14/app/src/main/java/com/example/workcost/EstimateStorage.kt
           cp PriceStorage.kt buildv14/app/src/main/java/com/example/workcost/PriceStorage.kt
           cp SettingsScreen.kt buildv14/app/src/main/java/com/example/workcost/SettingsScreen.kt
+          cp CustomWork.kt buildv14/app/src/main/java/com/example/workcost/CustomWork.kt
+          cp CustomWorkStorage.kt buildv14/app/src/main/java/com/example/workcost/CustomWorkStorage.kt
+          cp ManageWorksScreen.kt buildv14/app/src/main/java/com/example/workcost/ManageWorksScreen.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
 
       - name: Update AndroidManifest.xml
