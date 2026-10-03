@@ -77,7 +77,6 @@ jobs:
           cp ../b342691e-908f-4f78-a4af-5788cef786ff.png app/src/main/res/drawable/logo.png
 
           # Загружаем логотип из корня репозитория
-          logo_path = '../b342691e-908f-4f78-a4af-5788cef786ff.png'
           img = Image.open(logo_path).convert("RGBA")
 
           # Размеры для разных плотностей
