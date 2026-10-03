@@ -172,30 +172,27 @@ fun WorksScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Кнопка "Показать смету" на всю ширину
-        Button(
-            onClick = { showEstimateDialog = true },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(Icons.Default.List, contentDescription = "Смета", modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("Показать смету")
+            Button(
+                onClick = { showEstimateDialog = true },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(Icons.Default.List, contentDescription = "Смета", modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Смета")
+            }
+            Button(
+                onClick = { PdfExporter.sharePdf(context, estimate) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("PDF")
+            }
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Кнопка "Отправить PDF" на всю ширину
-        Button(
-            onClick = { PdfExporter.sharePdf(context, estimate) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF", modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("Отправить PDF")
-        }
-    }
 
     if (showEstimateDialog) {
         AlertDialog(
