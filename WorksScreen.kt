@@ -1,10 +1,12 @@
 package com.example.workcost
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,7 +32,6 @@ fun WorksScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showEstimateDialog by remember { mutableStateOf(false) }
 
-    // Сохраняем тексты ввода отдельно — это решает проблему с фокусом
     val volumeInputs = remember { mutableStateMapOf<Int, String>() }
     val priceInputs = remember { mutableStateMapOf<Int, String>() }
 
@@ -149,29 +150,33 @@ fun WorksScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(filteredWorks, key = { it.id }) { work ->
+            itemsIndexed(filteredWorks, key = { _, work -> work.id }) { index, work ->
                 val existingItem = estimate.items.find { it.workId == work.id }
                 val isSelected = existingItem != null
+                var isExpanded by remember { mutableStateOf(isSelected) }
 
-                // Инициализируем поля ввода при первом показе
-                LaunchedEffect(work.id, isSelected) {
+                LaunchedEffect(work.id) {
                     if (isSelected) {
                         volumeInputs.putIfAbsent(work.id, existingItem?.quantity?.toString() ?: "")
                         priceInputs.putIfAbsent(work.id, existingItem?.price?.toString() ?: work.price.toString())
-                    } else {
-                        volumeInputs.remove(work.id)
-                        priceInputs.remove(work.id)
                     }
                 }
 
                 WorkRow(
+                    number = index + 1,
                     work = work,
                     isSelected = isSelected,
+                    isExpanded = isExpanded,
                     volume = volumeInputs[work.id] ?: "",
                     price = priceInputs[work.id] ?: work.price.toString(),
+                    onExpandToggle = {
+                        isExpanded = !isExpanded
+                    },
                     onToggle = {
                         if (isSelected) {
                             estimate.items.remove(existingItem)
+                            volumeInputs.remove(work.id)
+                            priceInputs.remove(work.id)
                         } else {
                             estimate.items.add(
                                 EstimateItem(
@@ -182,6 +187,9 @@ fun WorksScreen(
                                     quantity = 0.0
                                 )
                             )
+                            volumeInputs[work.id] = ""
+                            priceInputs[work.id] = work.price.toString()
+                            isExpanded = true
                         }
                         saveCurrentEstimate()
                     },
@@ -229,8 +237,8 @@ fun WorksScreen(
                     if (estimate.items.isEmpty()) {
                         Text("Ничего не выбрано")
                     } else {
-                        estimate.items.forEach { item ->
-                            Text("${item.name}: ${item.quantity} ${item.unit} × ${item.price} = ${"%.2f".format(item.sum())} ₽")
+                        estimate.items.forEachIndexed { index, item ->
+                            Text("${index + 1}. ${item.name}: ${item.quantity} ${item.unit} × ${item.price} = ${"%.2f".format(item.sum())} ₽")
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -252,41 +260,64 @@ fun WorksScreen(
 
 @Composable
 fun WorkRow(
+    number: Int,
     work: WorkItem,
     isSelected: Boolean,
+    isExpanded: Boolean,
     volume: String,
     price: String,
+    onExpandToggle: () -> Unit,
     onToggle: () -> Unit,
     onVolumeChange: (String) -> Unit,
     onPriceChange: (String) -> Unit
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { onExpandToggle() }
+            ) {
+                Text(
+                    text = "$number.",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(32.dp)
+                )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(work.name, fontWeight = FontWeight.Bold)
                     Text("Ед. изм.: ${work.unit}", style = MaterialTheme.typography.bodySmall)
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = volume,
-                    onValueChange = onVolumeChange,
-                    label = { Text("Объём") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    enabled = isSelected
-                )
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = onPriceChange,
-                    label = { Text("Цена") },
-                    modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    enabled = isSelected
-                )
+
+            AnimatedVisibility(visible = isExpanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Checkbox(checked = isSelected, onCheckedChange = { onToggle() })
+                        Text("Выбрать эту работу")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = volume,
+                            onValueChange = onVolumeChange,
+                            label = { Text("Объём") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            enabled = isSelected
+                        )
+                        OutlinedTextField(
+                            value = price,
+                            onValueChange = onPriceChange,
+                            label = { Text("Цена") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            enabled = isSelected
+                        )
+                    }
+                }
             }
         }
     }
