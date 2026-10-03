@@ -141,10 +141,14 @@ fun WorksScreen(
 
         val currentCategory = categories[selectedTab]
         val allWorks = remember { WorkRepository.getWorks(context) }
-        val filteredWorks = allWorks.filter {
-            it.category == currentCategory &&
-            (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
-        }
+        val filteredWorks = allWorks
+            .filter {
+                it.category == currentCategory &&
+                (searchQuery.isEmpty() || it.name.contains(searchQuery, ignoreCase = true))
+            }
+            .sortedByDescending { work ->
+                estimate.items.any { it.workId == work.id }
+            }
 
         LazyColumn(
             modifier = Modifier.weight(1f),
