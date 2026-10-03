@@ -158,12 +158,12 @@ fun WorksScreen(
                         }
                         saveCurrentEstimate()
                     },
-                    onVolumeChange = { newVolume ->
+                    onVolumeChange = { newVolume: String ->
                         volumeInputs[work.id] = newVolume
                         existingItem?.quantity = newVolume.toDoubleOrNull() ?: 0.0
                         saveCurrentEstimate()
                     },
-                    onPriceChange = { newPrice ->
+                    onPriceChange = { newPrice: String ->
                         priceInputs[work.id] = newPrice
                         existingItem?.price = newPrice.toDoubleOrNull() ?: work.price
                         saveCurrentEstimate()
@@ -171,6 +171,8 @@ fun WorksScreen(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -193,6 +195,7 @@ fun WorksScreen(
                 Text("PDF")
             }
         }
+    }
 
     if (showEstimateDialog) {
         AlertDialog(
