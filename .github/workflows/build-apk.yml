@@ -29,7 +29,7 @@ jobs:
         run: |
           unzip -q WorkCostCalculator_Android_v1_4_phone_build_fixed.zip
 
-          - name: Copy source files to project
+      - name: Copy source files to project
         run: |
           cp WorkData.kt buildv14/app/src/main/java/com/example/workcost/WorkData.kt
           cp Estimate.kt buildv14/app/src/main/java/com/example/workcost/Estimate.kt
@@ -47,6 +47,7 @@ jobs:
           cp PdfExporter.kt buildv14/app/src/main/java/com/example/workcost/PdfExporter.kt
           cp EstimateImporter.kt buildv14/app/src/main/java/com/example/workcost/EstimateImporter.kt
           cp MainActivity.kt buildv14/app/src/main/java/com/example/workcost/MainActivity.kt
+
       - name: Update AndroidManifest.xml
         run: |
           cd buildv14
