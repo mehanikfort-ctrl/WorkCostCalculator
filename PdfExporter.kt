@@ -61,7 +61,7 @@ object PdfExporter {
         var page = document.startPage(pageInfo)
         var canvas = page.canvas
 
-        var y = MARGIN + 20f
+        var y = MARGIN + 60f
 
         // Заголовок
         canvas.drawText("СМЕТА НА ВЫПОЛНЕНИЕ РАБОТ", MARGIN, y, titlePaint)
