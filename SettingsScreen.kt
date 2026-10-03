@@ -17,7 +17,10 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     var refreshTrigger by remember { mutableStateOf(0) }
+    
+    // Перезагружаем список при каждом изменении refreshTrigger
     val works = remember(refreshTrigger) { WorkRepository.getWorks(context) }
+    
     var editingWorkId by remember { mutableStateOf<Int?>(null) }
     var newPrice by remember { mutableStateOf("") }
 
@@ -59,21 +62,21 @@ fun SettingsScreen(
                             OutlinedTextField(
                                 value = newPrice,
                                 onValueChange = { newPrice = it },
-                                modifier = Modifier.width(120.dp),
+                                modifier = Modifier.width(110.dp),
                                 singleLine = true,
                                 label = { Text("Цена") }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            IconButton(onClick = {
+                            Spacer(modifier = Modifier.width(4.dp))
+                            TextButton(onClick = {
                                 val price = newPrice.toDoubleOrNull()
                                 if (price != null) {
                                     PriceStorage.savePrice(context, work.id, price)
-                                    refreshTrigger++
+                                    editingWorkId = null
+                                    newPrice = ""
+                                    refreshTrigger++ // Принудительно обновляем список
                                 }
-                                editingWorkId = null
-                                newPrice = ""
                             }) {
-                                Text("✓")
+                                Text("OK")
                             }
                         } else {
                             TextButton(onClick = {
@@ -99,12 +102,5 @@ fun SettingsScreen(
         ) {
             Text("Сбросить все цены к стандартным")
         }
-    }
-}
-
-@Composable
-fun IconButton(onClick: () -> Unit, content: @Composable () -> Unit) {
-    androidx.compose.material3.IconButton(onClick = onClick) {
-        content()
     }
 }
